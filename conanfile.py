@@ -41,15 +41,30 @@ class SnappyConan(ConanFile):
         tools.get(**self.conan_data["sources"][self.version],
                   destination=self._source_subfolder, strip_root=True)
 
+    def _patch_sources(self):
+        if tools.Version(self.version) >= "1.1.9":
+            # No warnings as errors
+            tools.replace_in_file(os.path.join(self._source_subfolder, "CMakeLists.txt"),
+                                  "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Werror\")",
+                                  "")
+
     def _configure_cmake(self):
         if self._cmake:
             return self._cmake
         self._cmake = CMake(self)
         self._cmake.definitions["SNAPPY_BUILD_TESTS"] = False
+        if tools.Version(self.version) >= "1.1.9":
+            self._cmake.definitions["SNAPPY_BUILD_BENCHMARKS"] = False
+        if tools.Version(self.version) >= "1.1.8":
+            self._cmake.definitions["SNAPPY_FUZZING_BUILD"] = False
+            self._cmake.definitions["SNAPPY_REQUIRE_AVX"] = False
+            self._cmake.definitions["SNAPPY_REQUIRE_AVX2"] = False
+            self._cmake.definitions["SNAPPY_INSTALL"] = True
         self._cmake.configure(build_folder=self._build_subfolder)
         return self._cmake
 
     def build(self):
+        self._patch_sources()
         cmake = self._configure_cmake()
         cmake.build()
 
