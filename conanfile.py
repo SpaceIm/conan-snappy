@@ -28,7 +28,7 @@ class SnappyConan(ConanFile):
         return "build_subfolder"
 
     def config_options(self):
-        if self.settings.os == 'Windows':
+        if self.settings.os == "Windows":
             del self.options.fPIC
 
     def configure(self):
