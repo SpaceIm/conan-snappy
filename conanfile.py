@@ -79,6 +79,6 @@ class SnappyConan(ConanFile):
         self.cpp_info.names["cmake_find_package_multi"] = "Snappy"
         self.cpp_info.components["snappylib"].names["cmake_find_package"] = "snappy"
         self.cpp_info.components["snappylib"].names["cmake_find_package_multi"] = "snappy"
-        self.cpp_info.components["snappylib"].libs = tools.collect_libs(self)
+        self.cpp_info.components["snappylib"].libs = ["snappy"]
         if not self.options.shared and tools.stdcpp_library(self):
             self.cpp_info.components["snappylib"].system_libs.append(tools.stdcpp_library(self))
