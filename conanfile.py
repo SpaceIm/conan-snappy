@@ -11,12 +11,13 @@ class SnappyConan(ConanFile):
     url = "https://github.com/conan-io/conan-center-index"
     homepage = "https://github.com/google/snappy"
     license = "BSD-3-Clause"
-    exports_sources = ["CMakeLists.txt"]
-    generators = "cmake"
+
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
 
+    exports_sources = ["CMakeLists.txt", "patches/**"]
+    generators = "cmake"
     _cmake = None
 
     @property
@@ -42,6 +43,8 @@ class SnappyConan(ConanFile):
                   destination=self._source_subfolder, strip_root=True)
 
     def _patch_sources(self):
+        for patch in self.conan_data.get("patches", {}).get(self.version, []):
+            tools.patch(**patch)
         if tools.Version(self.version) >= "1.1.9":
             # No warnings as errors
             tools.replace_in_file(os.path.join(self._source_subfolder, "CMakeLists.txt"),
